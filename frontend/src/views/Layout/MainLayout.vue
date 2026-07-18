@@ -6,7 +6,8 @@ import { RouterLink, RouterView } from 'vue-router'
   <div class="main-layout">
     <nav class="app-nav">
       <div class="nav-inner">
-        <RouterLink to="/" class="nav-brand">MyApp</RouterLink>
+        <RouterLink to="/" class="nav-brand"><img src="@/assets/logo.svg" alt="Logo" class="nav-logo" />
+        </RouterLink>
         <div class="nav-links">
           <RouterLink to="/" class="nav-link">首页</RouterLink>
           <RouterLink to="/about" class="nav-link">关于</RouterLink>
@@ -41,13 +42,14 @@ import { RouterLink, RouterView } from 'vue-router'
 }
 
 .nav-brand {
-  font-size: 1.25rem;
-  font-weight: 700;
-  color: #333;
   display: flex;
-  height: 32px;
+  align-items: center;
+  height: 40px;
+}
+
+.nav-logo {
+  height: 100%;
   width: auto;
-  display: block;
 }
 
 .nav-links {
