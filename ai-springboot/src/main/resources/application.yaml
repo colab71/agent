@@ -4,6 +4,17 @@ spring:
     username: root
     password: 123456
 
+  ai:
+    openai:
+      chat:
+        options:
+          model: deepseek-ai/DeepSeek-V3
+          tool-calling:
+            enabled: true
+        completions-path: /v1/chat/completions
+      api-key: sk-itqfyjalztcudihvggpggxfmjoemowiavyiwagvnmewehcls
+      base-url: https://api.siliconflow.cn
+
 # 服务器配置
 server:
   port: 80

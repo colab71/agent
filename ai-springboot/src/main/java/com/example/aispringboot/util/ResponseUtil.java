@@ -18,11 +18,22 @@ import java.nio.charset.StandardCharsets;
 public class ResponseUtil {
     public static void writeError(HttpServletResponse response, ResultCode resultCode){
         //根据不同状态码返回不同响应
-        int status = switch (resultCode){
-            case UNAUTHORIZED , ACCESS_UNAUTHORIZED,TOKEN_INVALID,TOKEN_EXPIRED,TOKEN_BLOCKED -> HttpStatus.UNAUTHORIZED.value();
-            case TOKEN_ACCESS_FORBIDDEN -> HttpStatus.FORBIDDEN.value();
-            default -> HttpStatus.BAD_REQUEST.value();
-        };
+        int status;
+        switch (resultCode) {
+            case UNAUTHORIZED:
+            case ACCESS_UNAUTHORIZED:
+            case TOKEN_INVALID:
+            case TOKEN_EXPIRED:
+            case TOKEN_BLOCKED:
+                status = HttpStatus.UNAUTHORIZED.value();
+                break;
+            case TOKEN_ACCESS_FORBIDDEN:
+                status = HttpStatus.FORBIDDEN.value();
+                break;
+            default:
+                status = HttpStatus.BAD_REQUEST.value();
+                break;
+        }
         response.setStatus(status);
         response.setContentType(MediaType.APPLICATION_JSON_VALUE);
         response.setCharacterEncoding(StandardCharsets.UTF_8.name());

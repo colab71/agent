@@ -2,6 +2,7 @@ package com.example.aispringboot.config;
 
 import cn.hutool.core.text.AntPathMatcher;
 import com.example.aispringboot.util.JwtAuthorizationFilter;
+import jakarta.servlet.DispatcherType;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.config.Customizer;
@@ -27,7 +28,8 @@ public class SecurityConfig {
             "/",
             "/api/test",
             "/api/user/login",
-            "/api/user/add"
+            "/api/user/add",
+            "/error"
     };
 
     public static Boolean isPublicPath(String requestUrl){
@@ -56,7 +58,8 @@ public class SecurityConfig {
                 //配置请求的授权规则
                 .authorizeHttpRequests( auth ->
                         //公开的路径，无需访问
-                        auth.requestMatchers(PUBLIC_PATHS).permitAll()
+                        auth.dispatcherTypeMatchers(DispatcherType.ASYNC, DispatcherType.ERROR).permitAll()
+                        .requestMatchers(PUBLIC_PATHS).permitAll()
                         //其他请求都需要认证
                         .anyRequest().authenticated()
 
