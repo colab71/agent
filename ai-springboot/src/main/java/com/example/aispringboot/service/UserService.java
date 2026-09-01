@@ -12,4 +12,6 @@ public interface UserService {
     UserLoginResponseDTO.UserDetailResponseDTO register(@Valid UserRegisterCommandDTO commandDTO);
 
     UserLoginResponseDTO.UserDetailResponseDTO getUserById(Long userId);
+
+    void logout();
 }

@@ -1,5 +1,6 @@
 package com.example.aispringboot.util;
 
+import com.auth0.jwt.exceptions.JWTVerificationException;
 import com.example.aispringboot.DTO.response.UserLoginResponseDTO;
 import com.example.aispringboot.common.ResultCode;
 import com.example.aispringboot.enumClass.UserStatus;
@@ -27,6 +28,9 @@ public class JwtAuthorizationFilter extends OncePerRequestFilter {
     @Resource
     private UserService userService;
 
+    @Resource
+    private JwtTokenUtil jwtTokenUtil;
+
     private static final String GRANT_PROFIX = "ROLE_";
 
     private static final String TOKEN_AFTER_VALIDATION = "jwtToken";
@@ -47,11 +51,22 @@ public class JwtAuthorizationFilter extends OncePerRequestFilter {
         System.out.println(method);
 
         //获取token
-        String token = JwtTokenUtil.extractTokenFromRequest(request);
+        String token = jwtTokenUtil.extractTokenFromRequest(request);
         if (StringUtils.hasText(token)) {
             //验证token并提取用户信息
             //验证token
-            JwtTokenUtil.TokenVerificationResult validationResult = JwtTokenUtil.validateToken(token);
+            JwtTokenUtil.TokenVerificationResult validationResult = null;
+            try {
+                validationResult = jwtTokenUtil.validateToken(token);
+            } catch (JWTVerificationException e) {
+                SecurityContextHolder.clearContext();
+                if(e.getMessage().equals(ResultCode.TOKEN_BLOCKED.getMessage())){
+                    ResponseUtil.writeError(response,ResultCode.TOKEN_BLOCKED);
+                }else {
+                    ResponseUtil.writeError(response, ResultCode.TOKEN_INVALID);
+                }
+                return;
+            }
             if (validationResult != null && validationResult.isValid()) {
                 //token查询用户信息
                 UserLoginResponseDTO.UserDetailResponseDTO userInfo = userService.getUserById(validationResult.getUserId());

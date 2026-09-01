@@ -4,21 +4,30 @@ import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.example.aispringboot.DTO.command.UserLoginCommandDTO;
 import com.example.aispringboot.DTO.command.UserRegisterCommandDTO;
 import com.example.aispringboot.DTO.response.UserLoginResponseDTO;
-import com.example.aispringboot.common.Result;
 import com.example.aispringboot.entity.User;
 import com.example.aispringboot.enumClass.UserType;
 import com.example.aispringboot.exception.BusinessException;
 import com.example.aispringboot.mapper.UserMapper;
 import com.example.aispringboot.service.UserService;
 import com.example.aispringboot.service.convert.UserConvert;
+import com.example.aispringboot.util.BlacklistUtil;
 import com.example.aispringboot.util.JwtTokenUtil;
 import jakarta.annotation.Resource;
-import org.apache.el.parser.Token;
+import org.springframework.data.redis.core.StringRedisTemplate;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 
+import java.util.concurrent.TimeUnit;
+
 @Service
 public class UserServiceImpl implements UserService {
+
+    @Resource
+    private StringRedisTemplate template;
+
+    @Resource
+    private JwtTokenUtil jwtTokenUtil;
 
     @Resource
     private UserMapper userMapper;
@@ -48,7 +57,7 @@ public class UserServiceImpl implements UserService {
         }
 
         //生成jwttoken
-        String token = JwtTokenUtil.generateToken(user.getId(), user.getUsername(), user.getUserType());
+        String token = jwtTokenUtil.generateToken(user.getId(), user.getUsername(), user.getUserType());
 
         UserLoginResponseDTO.UserDetailResponseDTO userInfo = UserConvert.entityToDetailResponse(user);
         UserLoginResponseDTO result = UserConvert.entityToLoginResponse(token,userInfo);
@@ -103,4 +112,17 @@ public class UserServiceImpl implements UserService {
         }
         return UserConvert.entityToDetailResponse(user);
     }
+
+    @Override
+    public void logout() {
+        //清理上下文
+        SecurityContextHolder.clearContext();
+        //获取请求头中的token
+        String token = jwtTokenUtil.getCurrentToken();
+        //数据在redis存储时间
+        Long time = jwtTokenUtil.getVerificationTime(token) - System.currentTimeMillis();
+        //将token添加到黑名单
+        template.opsForValue().set(BlacklistUtil.REDIS_BLACKLIST_KEY + token, System.currentTimeMillis() + "",time, TimeUnit.MILLISECONDS);
+    }
+
 }

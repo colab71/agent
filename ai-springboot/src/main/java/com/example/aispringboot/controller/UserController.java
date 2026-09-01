@@ -19,6 +19,9 @@ public class UserController {
     @Resource
     private UserService userService;
 
+    @Resource
+    private JwtTokenUtil jwtTokenUtil;
+
     //用户登录接口
     @PostMapping("/login")
     public Result<UserLoginResponseDTO> login(@Valid @RequestBody UserLoginCommandDTO commandDTO){
@@ -36,9 +39,17 @@ public class UserController {
     //获取用户信息
     @GetMapping("/current")
     public Result<UserLoginResponseDTO.UserDetailResponseDTO> current(){
-        String token = JwtTokenUtil.getCurrentToken();
-        DecodedJWT jwt = JwtTokenUtil.verifyToken(token);
+        String token = jwtTokenUtil.getCurrentToken();
+        DecodedJWT jwt = jwtTokenUtil.verifyToken(token);
         UserLoginResponseDTO.UserDetailResponseDTO user = userService.getUserById(jwt.getClaim("userId").asLong());
         return Result.success(user);
     }
+
+    //用户退出登录
+    @PostMapping("/logout")
+    public Result<Void> logout(){
+        userService.logout();
+        return Result.success();
+    }
+
 }

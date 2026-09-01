@@ -2,7 +2,10 @@ package com.example.aispringboot.service.impl;
 
 import cn.hutool.core.date.DateUtil;
 import cn.hutool.core.util.StrUtil;
+import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
+import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.example.aispringboot.DTO.command.ConsultationSessionCreateDTO;
+import com.example.aispringboot.DTO.response.ConsultationSessionPageResponseDTO;
 import com.example.aispringboot.entity.ConsultationSession;
 import com.example.aispringboot.entity.User;
 import com.example.aispringboot.mapper.ConsultationSessionMapper;
@@ -42,5 +45,11 @@ public class ConsultationSessionServiceImpl implements ConsultationSessionServic
             return session;
         }
         return null;
+    }
+
+    @Override
+    public Page<ConsultationSessionPageResponseDTO> getSessionByPage(Long pageNum, Long pageSize) {
+        Page<ConsultationSessionPageResponseDTO> page = new Page<>(pageNum, pageSize);
+        return consultationSessionMapper.selectSessionPage(page);
     }
 }
