@@ -11,6 +11,9 @@ public enum ResultCode {
     PARAM_MISSING("4001", "缺少必要参数"),
     PARAM_INVALID("4002", "参数格式不正确"),
 
+    //权限不足
+    PERMISSION_DENIED("403", "查询权限不足"),
+
     // 文件操作相关错误
     FILE_NOT_FOUND("5001", "文件不存在"),
     FILE_UPLOAD_FAILED("5002", "文件上传失败"),

@@ -7,6 +7,8 @@ import com.example.aispringboot.DTO.response.ConsultationSessionPageResponseDTO;
 import com.example.aispringboot.entity.ConsultationMessage;
 import com.example.aispringboot.entity.ConsultationSession;
 
+import java.util.List;
+
 public interface ConsultationMessageService {
 
     ConsultationMessage saveUserMessage(Long sessionId, String content, String emotionTag);
@@ -16,4 +18,6 @@ public interface ConsultationMessageService {
     public Integer getMessageCount(Long sessionId);
 
     public ConsultationMessageResponseDTO getLastMessage(Long sessionId);
+
+    public List<ConsultationMessageResponseDTO> getMessagesBySessionId(String sessionId);
 }

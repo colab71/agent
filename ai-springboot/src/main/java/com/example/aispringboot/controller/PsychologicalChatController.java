@@ -7,10 +7,12 @@ import com.example.aispringboot.AiService.PsychologicalSupportService;
 import com.example.aispringboot.AiService.StructOutPut;
 import com.example.aispringboot.DTO.command.ConsultationSessionCreateDTO;
 import com.example.aispringboot.DTO.command.ConsultationStreamDTO;
+import com.example.aispringboot.DTO.response.ConsultationMessageResponseDTO;
 import com.example.aispringboot.DTO.response.ConsultationSessionPageResponseDTO;
 import com.example.aispringboot.DTO.response.UserLoginResponseDTO;
 import com.example.aispringboot.common.Result;
 import com.example.aispringboot.common.ResultCode;
+import com.example.aispringboot.exception.BusinessException;
 import com.example.aispringboot.service.ConsultationMessageService;
 import com.example.aispringboot.service.ConsultationSessionService;
 import com.example.aispringboot.service.UserService;
@@ -18,12 +20,15 @@ import com.example.aispringboot.util.JwtTokenUtil;
 import jakarta.annotation.Resource;
 import jakarta.validation.Valid;
 import org.springframework.boot.context.properties.bind.DefaultValue;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
+import org.springframework.http.ResponseEntity;
 import org.springframework.http.codec.ServerSentEvent;
 import org.springframework.web.bind.annotation.*;
 import reactor.core.publisher.Flux;
 
 import java.time.Duration;
+import java.util.List;
 import java.util.Map;
 
 @RestController
@@ -38,6 +43,9 @@ public class PsychologicalChatController {
 
     @Resource
     private ConsultationSessionService consultationSessionService;
+
+    @Resource
+    private ConsultationMessageService consultationMessageService;
 
     @PostMapping("/session/start")
     public Result<StructOutPut.StreamChat> startSession(@Valid @RequestBody ConsultationSessionCreateDTO createDTO){
@@ -100,5 +108,32 @@ public class PsychologicalChatController {
             @RequestParam(defaultValue = "10") Long pageSize
             ){
         return Result.success(consultationSessionService.getSessionByPage(pageNum,pageSize));
+    }
+
+    @GetMapping("/sessions/{sessionId}/messages")
+    public ResponseEntity<Result<List<ConsultationMessageResponseDTO>>> getMessagesBySessionId(@PathVariable String sessionId){
+        try {
+            return ResponseEntity.ok(Result.success(consultationMessageService.getMessagesBySessionId(sessionId)));
+        } catch (BusinessException e) {
+            if(e.getMessage().equals("sessionId格式错误")){
+                return ResponseEntity.badRequest().body(Result.error(ResultCode.PARAM_INVALID.getCode(),ResultCode.PARAM_INVALID.getMessage(), null));
+            }else{
+                return ResponseEntity.status(HttpStatus.FORBIDDEN).build();
+            }
+        }
+    }
+
+    @DeleteMapping("/sessions/{sessionId}")
+    public ResponseEntity<Result<Void>> deleteSession(@PathVariable String sessionId){
+        try {
+            consultationSessionService.deleteSession(sessionId);
+        } catch (BusinessException e) {
+            if(e.getMessage().equals("sessionId格式错误")){
+                return ResponseEntity.badRequest().body(Result.error(ResultCode.PARAM_INVALID.getCode(),ResultCode.PARAM_INVALID.getMessage(), null));
+            }else{
+                return ResponseEntity.status(HttpStatus.FORBIDDEN).build();
+            }
+        }
+        return ResponseEntity.ok(Result.success());
     }
 }

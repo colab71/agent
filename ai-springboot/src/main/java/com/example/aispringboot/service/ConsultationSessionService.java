@@ -9,4 +9,6 @@ public interface ConsultationSessionService {
     ConsultationSession createSession(Long userId, ConsultationSessionCreateDTO createDTO);
 
     Page<ConsultationSessionPageResponseDTO> getSessionByPage(Long pageNum, Long pageSize);
+
+    void deleteSession(String sessionId);
 }

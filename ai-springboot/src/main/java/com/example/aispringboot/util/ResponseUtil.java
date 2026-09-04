@@ -28,6 +28,7 @@ public class ResponseUtil {
                 status = HttpStatus.UNAUTHORIZED.value();
                 break;
             case TOKEN_ACCESS_FORBIDDEN:
+            case PERMISSION_DENIED:
                 status = HttpStatus.FORBIDDEN.value();
                 break;
             default:

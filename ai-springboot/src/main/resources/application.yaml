@@ -2,7 +2,7 @@ spring:
   datasource:
     url: jdbc:mysql://localhost:3306/mental_health_assistant?useSSL=false&serverTimezone=UTC
     username: root
-    password: 123456
+    password: your_password
 
   ai:
     openai:
@@ -12,15 +12,15 @@ spring:
           tool-calling:
             enabled: true
         completions-path: /v1/chat/completions
-      api-key: sk-itqfyjalztcudihvggpggxfmjoemowiavyiwagvnmewehcls
-      base-url: https://api.siliconflow.cn
+      api-key: your_api_key
+      base-url: your_base_url
 
   data:
     redis:
-      host: 192.168.44.100
+      host: your_redis_host
       port: 6379
       database: 1
-      password: 123456
+      password: your_redis_password
       lettuce:
         pool:
           max-active: 10
